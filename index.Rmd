@@ -1,0 +1,76 @@
+---
+title: "Ejercicio introductorio al modelo de regresión"
+author: "Jorge Enrique Lamadrid Bazán"
+date: "9/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(devtools)) {install.packages('devtools')
+  library(devtools)} else {library(devtools)}
+if (!require(PoEdata)) {install_git("https://github.com/ccolonescu/PoEdata")
+  library(PoEdata)} else {library(PoEdata)}
+if (!require(stargazer)) {install.packages('stargazer')
+  library(stargazer)} else {library(stargazer)}
+if (!require(stargazer)) {install.packages('stargazer')
+  library(stargazer)} else {library(stargazer)}
+if (!require(kableExtra)) {install.packages('kableExtra')
+  library(kableExtra)} else {library(kableExtra)}
+if (!require(ggplot2)) {install.packages('plotly')
+  library(ggplot2)} else {library(plotly)}
+```
+
+# Introducción al ejercicio
+
+En el presente ejercicio, se realizará la primer regresión de la materia en donde se correrá una regresión con el método de mínimos cuadrados ordinarios, utilizando la regresión keynesiana siguiente:
+
+\begin{equation}
+\widehat{\text{Gasto}_i}=\alpha+\beta\cdot \text{Ingreso}_i
+\end{equation}
+
+Esto para estimar la media condicional ($\widehat{\text{Gasto}_i}$) del gasto como variable aleatoria:
+
+\begin{equation}
+\begin{array}
+\text{Gasto}_i= & \alpha+\beta\cdot \text{Ingreso}_i+\varepsilon_i \\
+\text{Gasto}_i= & \widehat{\text{Gasto}_i}+\varepsilon_i
+\end{array}
+\end{equation}
+
+Para esto se cargan los datos `food` del libro de Carter-Hill (2011), capítulo 2 como se aprecia a continuación en las primeras 15 observaciones del objeto `food`:
+
+```{r datos, echo=FALSE}
+data("food")
+colnames(food)=c("Ingreso","Gasto")
+kable(food[1:15,],caption = "Datos de ingreso y consumo del ejercicio de Carter-Hill et.al.")%>%kable_styling(font_size = 12,bootstrap_options = c("striped", "hover"))%>%add_footnote("Fuente: Carter-Hill et. al. (2011)")%>%
+column_spec(1:2, width_min = "2cm")
+```
+
+```{r}
+lm("Gasto~Ingreso", data=food)
+regresion1=lm("Gasto~Ingreso", data=food)
+summary(regresion1)
+
+```
+
+```{r regauto, results='asis', echo=FALSE, error=FALSE}
+regresion1=lm("Gasto~Ingreso", data=food)
+stargazer(regresion1, type= "html", out="tabla_regresion1.doc",
+          title = "Tabla de regresión gasto-ingreso",
+          dep.var.labels=c("Gasto dado el ingreso"),
+          report = "vc*",
+          covariate.labels = c("Beta","Alpha"))
+          
+
+```
+
+Ahora lo graficamos:
+
+```{r graf1, echo=FALSE, error=FALSE}
+graf1=ggplot(aes(x=Ingreso,y=Gasto),data=food)+geom_point(colour="green")+
+  geom_smooth(method = "lm", colour="blue")
+ggplotly(graf1)
+
+
+```
